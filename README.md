@@ -1,5 +1,4 @@
-# AI-Assisted Airbase Operations Planning
-
+# Digital Twin for AI Airbase Operations Planning
 A simulation-based digital twin for airbase operations that models aircraft turnaround activities (landing, refueling, rearming, and takeoff) while accounting for operational constraints such as limited resources and satellite observation risk.
 
 The system combines discrete-event simulation (SimPy) with an interactive dashboard (Streamlit) to visualize operations and predict delays in real time.
