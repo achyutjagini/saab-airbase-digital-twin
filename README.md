@@ -96,24 +96,23 @@ Event Logging System
       ↓
 Streamlit Dashboard Visualization
 
-📂 Project Structure
-
+## 📂 Project Structure
 saab-airbase-digital-twin/
 │
 ├── dashboard/
-│   └── dashboard.py        # Streamlit UI
+│ └── dashboard.py # Streamlit UI
 │
 ├── simulation/
-│   └── simulator.py        # SimPy simulation engine
+│ └── simulator.py # SimPy simulation engine
 │
 ├── model/
-│   └── airbase_model.py    # Aircraft and airbase models
+│ └── airbase_model.py # Aircraft and airbase models
 │
 ├── optimizer/
-│   └── scheduler.py        # Aircraft scheduling logic
+│ └── scheduler.py # Aircraft scheduling logic
 │
-├── main.py                 # CLI simulation entry point
-├── requirements.txt        # Dependencies
+├── main.py # CLI simulation entry point
+├── requirements.txt # Dependencies
 └── README.md
 
 
