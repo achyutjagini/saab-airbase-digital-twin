@@ -95,8 +95,10 @@ SimPy Discrete Event Simulation
 Event Logging System
       ↓
 Streamlit Dashboard Visualization
+
 📂 Project Structure
-airbase-digital-twin/
+
+saab-airbase-digital-twin/
 │
 ├── dashboard/
 │   └── dashboard.py        # Streamlit UI
@@ -113,6 +115,8 @@ airbase-digital-twin/
 ├── main.py                 # CLI simulation entry point
 ├── requirements.txt        # Dependencies
 └── README.md
+
+
 ⚙️ Installation
 
 Clone the repository:
