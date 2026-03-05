@@ -5,6 +5,8 @@ class Aircraft:
         self.name = name
         self.priority = priority
         self.status = "waiting"
+        self.current_operation = "none"
+        self.start_time = 0
 
     def __repr__(self):
         return f"{self.name} ({self.status})"
