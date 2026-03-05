@@ -1,18 +1,25 @@
 # Main entry point for Airbase Digital Twin
-from model.airbase_model import Airbase, Aircraft
+import simpy
+from model.airbase_model import Aircraft
+from simulation.simulator import AirbaseSimulation
+
 
 def main():
 
-    base = Airbase()
+    env = simpy.Environment()
 
-    jet1 = Aircraft("Jet-1", priority=1)
-    jet2 = Aircraft("Jet-2", priority=2)
+    sim = AirbaseSimulation(env)
 
-    base.add_aircraft(jet1)
-    base.add_aircraft(jet2)
+    aircraft_list = [
+        Aircraft("Jet-1", priority=1),
+        Aircraft("Jet-2", priority=2),
+        Aircraft("Jet-3", priority=1)
+    ]
 
-    print("Airbase Aircraft:")
-    print(base.get_status())
+    for aircraft in aircraft_list:
+        env.process(sim.aircraft_process(aircraft))
+
+    env.run()
 
 
 if __name__ == "__main__":
