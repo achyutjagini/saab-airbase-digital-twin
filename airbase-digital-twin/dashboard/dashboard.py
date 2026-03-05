@@ -22,22 +22,53 @@ if 'simulation_run' not in st.session_state:
     st.session_state.simulation_run = False
     st.session_state.sim = None
     st.session_state.env = None
+    st.session_state.num_aircraft = 3
+    st.session_state.fuel_truck_capacity = 2
+    st.session_state.satellite_windows = [(10, 15), (40, 45)]
+    st.session_state.aircraft_counter = 3
 
 # Sidebar for simulation controls
 st.sidebar.header("Simulation Controls")
 
+# Scenario configuration
+st.sidebar.subheader("⚙️ Scenario Configuration")
+
+num_aircraft = st.sidebar.number_input(
+    "Number of Aircraft",
+    min_value=1,
+    max_value=10,
+    value=st.session_state.num_aircraft,
+    step=1
+)
+
+fuel_capacity = st.sidebar.selectbox(
+    "Fuel Truck Capacity",
+    options=[1, 2, 3],
+    index=1,
+    help="Simulate fuel truck failure by reducing capacity"
+)
+
+st.sidebar.divider()
+
 # Run simulation button
 if st.sidebar.button("🚀 Run Simulation", type="primary"):
+    # Update session state
+    st.session_state.num_aircraft = num_aircraft
+    st.session_state.fuel_truck_capacity = fuel_capacity
+    
     # Create new environment and simulation
     env = simpy.Environment()
-    sim = AirbaseSimulation(env)
+    sim = AirbaseSimulation(
+        env,
+        fuel_truck_capacity=fuel_capacity,
+        satellite_windows=st.session_state.satellite_windows
+    )
     
     # Create aircraft
-    aircraft_list = [
-        Aircraft("Jet-1", priority=1),
-        Aircraft("Jet-2", priority=2),
-        Aircraft("Jet-3", priority=1)
-    ]
+    aircraft_list = []
+    for i in range(num_aircraft):
+        priority = 1 if i % 2 == 0 else 2  # Alternate priorities
+        aircraft_list.append(Aircraft(f"Jet-{i+1}", priority=priority))
     
     # Start aircraft processes
     for aircraft in aircraft_list:
@@ -50,6 +81,47 @@ if st.sidebar.button("🚀 Run Simulation", type="primary"):
     st.session_state.simulation_run = True
     st.session_state.sim = sim
     st.session_state.env = env
+    st.session_state.aircraft_counter = num_aircraft
+    st.rerun()
+
+# Interactive scenario buttons
+st.sidebar.subheader("🎮 Interactive Scenarios")
+
+if st.sidebar.button("➕ Add Aircraft"):
+    if st.session_state.simulation_run:
+        st.session_state.num_aircraft += 1
+        st.sidebar.success(f"Added aircraft! Total: {st.session_state.num_aircraft}")
+        st.sidebar.info("Click 'Run Simulation' to apply changes")
+
+if st.sidebar.button("🛰️ Trigger Satellite Pass"):
+    if st.session_state.simulation_run:
+        # Add an extra satellite window
+        new_window = (20, 25)
+        if new_window not in st.session_state.satellite_windows:
+            st.session_state.satellite_windows.append(new_window)
+            st.sidebar.warning(f"Added satellite window: {new_window}")
+            st.sidebar.info("Click 'Run Simulation' to apply changes")
+
+if st.sidebar.button("🔧 Fuel Truck Failure"):
+    if st.session_state.simulation_run:
+        st.session_state.fuel_truck_capacity = 1
+        st.sidebar.error("Fuel truck capacity reduced to 1!")
+        st.sidebar.info("Click 'Run Simulation' to apply changes")
+
+if st.sidebar.button("📈 Increase Traffic"):
+    if st.session_state.simulation_run:
+        st.session_state.num_aircraft += 3
+        st.sidebar.success(f"Added 3 aircraft! Total: {st.session_state.num_aircraft}")
+        st.sidebar.info("Click 'Run Simulation' to apply changes")
+
+if st.sidebar.button("🔄 Reset Simulation"):
+    st.session_state.simulation_run = False
+    st.session_state.sim = None
+    st.session_state.env = None
+    st.session_state.num_aircraft = 3
+    st.session_state.fuel_truck_capacity = 2
+    st.session_state.satellite_windows = [(10, 15), (40, 45)]
+    st.session_state.aircraft_counter = 3
     st.rerun()
 
 # Display simulation results if run
@@ -69,7 +141,7 @@ if st.session_state.simulation_run and st.session_state.sim:
         st.success("✅ No satellite interference during operations")
     
     # Display satellite windows
-    st.info(f"**Configured Satellite Windows:** {SATELLITE_WINDOWS}")
+    st.info(f"**Configured Satellite Windows:** {sim.satellite_windows}")
     
     st.divider()
     

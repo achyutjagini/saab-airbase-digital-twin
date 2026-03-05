@@ -24,23 +24,33 @@ def satellite_overhead(time):
 
 class AirbaseSimulation:
 
-    def __init__(self, env):
+    def __init__(self, env, fuel_truck_capacity=2, satellite_windows=None):
 
         self.env = env
 
         # resources
         self.runway = simpy.Resource(env, capacity=1)
-        self.fuel_truck = simpy.Resource(env, capacity=2)
+        self.fuel_truck = simpy.Resource(env, capacity=fuel_truck_capacity)
         self.weapon_team = simpy.Resource(env, capacity=1)
+
+        # satellite windows (use custom or default)
+        self.satellite_windows = satellite_windows if satellite_windows is not None else SATELLITE_WINDOWS
 
         # state tracking
         self.events = []
         self.aircraft_states = {}
         self.resource_states = {
             "runway": {"capacity": 1, "in_use": 0},
-            "fuel_truck": {"capacity": 2, "in_use": 0},
+            "fuel_truck": {"capacity": fuel_truck_capacity, "in_use": 0},
             "weapon_team": {"capacity": 1, "in_use": 0}
         }
+
+    def satellite_overhead_check(self, time):
+        """Check if satellite is overhead at given time"""
+        for start, end in self.satellite_windows:
+            if start <= time <= end:
+                return True
+        return False
 
     def log_event(self, aircraft_name, event, status="completed"):
         """Log a structured event"""
@@ -92,7 +102,7 @@ class AirbaseSimulation:
             self.update_resource_state("fuel_truck", len(self.fuel_truck.queue) + len(self.fuel_truck.users))
 
             # Check for satellite overhead
-            while satellite_overhead(self.env.now):
+            while self.satellite_overhead_check(self.env.now):
                 self.update_aircraft_state(aircraft, "waiting", "satellite_delay")
                 self.log_event(aircraft.name, "satellite_delay", "waiting")
                 print(f"{self.env.now}: Satellite overhead, delaying refuel for {aircraft.name}")
@@ -111,7 +121,7 @@ class AirbaseSimulation:
             self.update_resource_state("weapon_team", 1)
 
             # Check for satellite overhead
-            while satellite_overhead(self.env.now):
+            while self.satellite_overhead_check(self.env.now):
                 self.update_aircraft_state(aircraft, "waiting", "satellite_delay")
                 self.log_event(aircraft.name, "satellite_delay", "waiting")
                 print(f"{self.env.now}: Satellite overhead, delaying rearm for {aircraft.name}")
